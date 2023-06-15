@@ -1,0 +1,383 @@
+\documentclass[11pt,preprint, authoryear]{elsarticle}
+
+\usepackage{lmodern}
+%%%% My spacing
+\usepackage{setspace}
+\setstretch{1.2}
+\DeclareMathSizes{12}{14}{10}{10}
+
+% Wrap around which gives all figures included the [H] command, or places it "here". This can be tedious to code in Rmarkdown.
+\usepackage{float}
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+} {
+    \endorigfigure
+}
+
+\let\origtable\table
+\let\endorigtable\endtable
+\renewenvironment{table}[1][2] {
+    \expandafter\origtable\expandafter[H]
+} {
+    \endorigtable
+}
+
+
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+    \usepackage{xltxtra,xunicode}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+
+\usepackage{amssymb, amsmath, amsthm, amsfonts}
+
+\def\bibsection{\section*{References}} %%% Make "References" appear before bibliography
+
+
+\usepackage[round]{natbib}
+
+\usepackage{longtable}
+\usepackage[margin=2.3cm,bottom=2cm,top=2.5cm, includefoot]{geometry}
+\usepackage{fancyhdr}
+\usepackage[bottom, hang, flushmargin]{footmisc}
+\usepackage{graphicx}
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1.3ex plus 0.5ex minus 0.3ex}
+\usepackage{textcomp}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\usepackage{array}
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+%%%%  Remove the "preprint submitted to" part. Don't worry about this either, it just looks better without it:
+\makeatletter
+\def\ps@pprintTitle{%
+  \let\@oddhead\@empty
+  \let\@evenhead\@empty
+  \let\@oddfoot\@empty
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+
+ \def\tightlist{} % This allows for subbullets!
+
+\usepackage{hyperref}
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=blue,
+            pdfborder={0 0 0}}
+
+
+% The following packages allow huxtable to work:
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{caption}
+
+
+\newenvironment{columns}[1][]{}{}
+
+\newenvironment{column}[1]{\begin{minipage}{#1}\ignorespaces}{%
+\end{minipage}
+\ifhmode\unskip\fi
+\aftergroup\useignorespacesandallpars}
+
+\def\useignorespacesandallpars#1\ignorespaces\fi{%
+#1\fi\ignorespacesandallpars}
+
+\makeatletter
+\def\ignorespacesandallpars{%
+  \@ifnextchar\par
+    {\expandafter\ignorespacesandallpars\@gobble}%
+    {}%
+}
+\makeatother
+
+\newenvironment{CSLReferences}[2]{%
+}
+
+\urlstyle{same}  % don't use monospace font for urls
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{5}
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+%%% Include extra packages specified by user
+
+%%% Hard setting column skips for reports - this ensures greater consistency and control over the length settings in the document.
+%% page layout
+%% paragraphs
+\setlength{\baselineskip}{12pt plus 0pt minus 0pt}
+\setlength{\parskip}{12pt plus 0pt minus 0pt}
+\setlength{\parindent}{0pt plus 0pt minus 0pt}
+%% floats
+\setlength{\floatsep}{12pt plus 0 pt minus 0pt}
+\setlength{\textfloatsep}{20pt plus 0pt minus 0pt}
+\setlength{\intextsep}{14pt plus 0pt minus 0pt}
+\setlength{\dbltextfloatsep}{20pt plus 0pt minus 0pt}
+\setlength{\dblfloatsep}{14pt plus 0pt minus 0pt}
+%% maths
+\setlength{\abovedisplayskip}{12pt plus 0pt minus 0pt}
+\setlength{\belowdisplayskip}{12pt plus 0pt minus 0pt}
+%% lists
+\setlength{\topsep}{10pt plus 0pt minus 0pt}
+\setlength{\partopsep}{3pt plus 0pt minus 0pt}
+\setlength{\itemsep}{5pt plus 0pt minus 0pt}
+\setlength{\labelsep}{8mm plus 0mm minus 0mm}
+\setlength{\parsep}{\the\parskip}
+\setlength{\listparindent}{\the\parindent}
+%% verbatim
+\setlength{\fboxsep}{5pt plus 0pt minus 0pt}
+
+
+
+\begin{document}
+
+
+
+\begin{frontmatter}  %
+
+\title{World Happiness Report}
+
+% Set to FALSE if wanting to remove title (for submission)
+
+
+
+
+\author[Add1]{Gabriella Neilon}
+\ead{22581340@sun.ac.za}
+
+
+
+
+
+\address[Add1]{Stellenbosch University}
+
+\cortext[cor]{Corresponding author: Gabriella Neilon}
+
+\begin{abstract}
+\small{
+The first question deals with Happiness. Will write more for final exam,
+this is just to test how it works. All of the write-ups will be subpar,
+as the purpose is first to get the hand of things.
+}
+\end{abstract}
+
+\vspace{1cm}
+
+
+\begin{keyword}
+\footnotesize{
+Multivariate GARCH \sep Kalman Filter \sep Copula \\
+\vspace{0.3cm}
+}
+\footnotesize{
+\textit{JEL classification} L250 \sep L100
+}
+\end{keyword}
+
+
+
+\vspace{0.5cm}
+
+\end{frontmatter}
+
+\setcounter{footnote}{0}
+
+
+
+%________________________
+% Header and Footers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\chead{}
+\rhead{}
+\lfoot{}
+\rfoot{\footnotesize Page \thepage}
+\lhead{}
+%\rfoot{\footnotesize Page \thepage } % "e.g. Page 2"
+\cfoot{}
+
+%\setlength\headheight{30pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%________________________
+
+\headsep 35pt % So that header does not go over title
+
+
+
+
+\hypertarget{introduction}{%
+\section{\texorpdfstring{Introduction
+\label{Introduction}}{Introduction }}\label{introduction}}
+
+Looking at happiness reports for different regions based on their
+Average Life Expectancy, and comparing it specifically to South Africa.
+
+\begin{quote}
+I suggest renaming the top line after @article, as done in the template
+ref.bib file, to something more intuitive for you to remember. Do not
+change the rest of the code. Also, be mindful of the fact that bib
+references from google scholar may at times be incorrect. Reference
+Latex forums for correct bibtex notation.
+\end{quote}
+
+\hypertarget{data}{%
+\section*{Data}\label{data}}
+\addcontentsline{toc}{section}{Data}
+
+Data corresponds to that given in the Mock Practical
+
+To make your graphs look extra nice in latex world, you could use Tikz
+device. Replace dev - `png' with `tikz' in the chunk below. Notice this
+makes the build time longer and produces extra tex files - so if you are
+comfortable with this, set your device to Tikz and try it out:
+
+To reference the plot above, add a ``\textbackslash label'\,' after the
+caption in the chunk heading, as done above. Then reference the plot as
+such: As can be seen, Figures \ref{Figure1} and \ref{Figure2} are
+excellent, with Figure \ref{Figure2} being particularly aesthetically
+pleasing due to its device setting of Tikz. The nice thing now is that
+it correctly numbers all your figures (and sections or tables) and will
+update if it moves. The links are also dynamic.
+
+I very strongly suggest using ggplot2 (ideally in combination with
+dplyr) using the ggtheme package to change the themes of your figures.
+
+Also note the information that I have placed above the chunks in the
+code chunks for the figures. You can edit any of these easily - visit
+the Rmarkdown webpage for more information.
+
+\hypertarget{splitting-a-page}{%
+\section{Splitting a page}\label{splitting-a-page}}
+
+You can also very easily split a page using built-in Pandoc formatting.
+I comment this out in the code (as this has caused issues building the
+pdf for some users - which I presume to be a Pandoc issue), but you are
+welcome to try it out yourself by commenting out the following section
+in your Rmd file.
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+Tables can be included as follows. Use the \emph{xtable} (or kable)
+package for tables. Table placement = H implies Latex tries to place the
+table Here, and not on a new page (there are, however, very many ways to
+skin this cat. Luckily there are many forums online!).
+
+\includegraphics{Project_Question1_files/figure-latex/ShortTable-1.pdf}
+
+This shows that America seems to be the happiest region, whereas
+Sub-Sahran Africa is the least.
+
+\hfill
+
+\hypertarget{huxtable}{%
+\subsection{Huxtable}\label{huxtable}}
+
+Huxtable is a very nice package for making working with tables between
+Rmarkdown and Tex easier.
+
+This cost some adjustment to the Tex templates to make it work, but it
+now works nicely.
+
+See documentation for this package
+\href{https://hughjonesd.github.io/huxtable/huxtable.html}{here}. A
+particularly nice addition of this package is for making the printing of
+regression results a joy (see
+\href{https://hughjonesd.github.io/huxtable/huxtable.html\#creating-a-regression-table}{here}).
+Here follows an example:
+
+If you are eager to use huxtable, comment out the Huxtable table in the
+Rmd template, and uncomment the colortbl package in your Rmd's root.
+
+Note that I do not include this in the ordinary template, as some latex
+users have complained it breaks when they build their Rmds (especially
+those using tidytex - I don't have this problem as I have the full
+Miktex installed on mine). Up to you, but I strongly recommend
+installing the package manually and using huxtable. To make this work,
+uncomment the \emph{Adding additional latex packages} part in yaml at
+the top of the Rmd file. Then comment out the huxtable example in the
+template below this line. Reknit, and enjoy.
+
+FYI - R also recently introduced the gt package, which is worthwhile
+exploring too.
+
+\hypertarget{lists}{%
+\section{Lists}\label{lists}}
+
+To add lists, simply using the following notation
+
+\begin{itemize}
+\item
+  This is really simple
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Just note the spaces here - writing in R you have to sometimes be
+    pedantic about spaces\ldots{}
+  \end{itemize}
+\item
+  Note that Rmarkdown notation removes the pain of defining
+  \LaTeX environments!
+\end{itemize}
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+I hope you find this template useful. Remember, stackoverflow is your
+friend - use it to find answers to questions. Feel free to write me a
+mail if you have any questions regarding the use of this package. To
+cite this package, simply type citation(``Texevier'') in Rstudio to get
+the citation for Katzke (\protect\hyperlink{ref-Texevier}{2017}) (Note
+that uncited references in your bibtex file will not be included in
+References).
+
+\newpage
+
+just in case
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-Texevier}{}}%
+Katzke, N.F. 2017. \emph{{Texevier}: {P}ackage to create elsevier
+templates for rmarkdown}. Stellenbosch, South Africa: Bureau for
+Economic Research.
+
+\end{CSLReferences}
+
+\bibliography{Tex/ref}
+
+
+
+
+
+\end{document}

@@ -3,7 +3,7 @@
 # Remove comments and add values where applicable.
 # The descriptions below should be self-explanatory
 
-title: "Helping You Write Academic Papers in R using Texevier"
+title: "Wine not"
 #subtitle: "This will appear as Right Header"
 
 documentclass: "elsarticle"
@@ -25,17 +25,17 @@ Thesis_FP: FALSE
 # --------- Front Page
 # Comment: ----- Follow this pattern for up to 5 authors
 AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
-Author1: "Jane Doe^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
-Ref1: "Some Institution, Cape Town, South Africa" # First Author's Affiliation
-Email1: "nfkatzke\\@gmail.com" # First Author's Email address
+Author1: "Gabriella Neilon"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University" # First Author's Affiliation
+Email1: "22581340\\@sun.ac.za" # First Author's Email address
 
-Author2: "John Smith"
-Ref2: "Some other Institution, Cape Town, South Africa"
-Email2: "John\\@gmail.com"
-CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
-
-Author3: "John Doe"
-Email3: "Joe\\@gmail.com"
+# Author2: "John Smith"
+# Ref2: "Some other Institution, Cape Town, South Africa"
+# Email2: "John\\@gmail.com"
+# CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+# 
+# Author3: "John Doe"
+# Email3: "Joe\\@gmail.com"
 
 CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
 
@@ -92,7 +92,7 @@ output:
     fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
     fig_height: 3.5
 abstract: |
-  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+  Abstract to be written here. This will look at at Wine
 ---
 
 <!-- First: Set your default preferences for chunk options: -->
@@ -143,20 +143,7 @@ In your tempalte folder, you will find a Data and a Code folder. In order to kee
 
 ```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure1}", fig.ext = 'png', fig.height = 3, fig.width = 6}
 
-  # This is just a random plot to show you a plot. This is done if the getwd() does not point to your Template's directory.
-  # Set WD below to your project's working directory.
-
-  g <-
-  ggplot(data = mtcars) +
-  geom_point(aes(x = disp, y = hp, color = cyl)) +
-  theme_bw() +
-  # theme(legend.position = "none") +
-  theme(plot.title = element_text(size = 10)) +
-  theme(axis.title = element_text(size = 10),
-        axis.title.x = element_text()) +
-  labs(y = "y-axis", x = "x-axis", title = "Some amazing plot")
-
-g
+  
 
 ```
 
@@ -164,29 +151,13 @@ To make your graphs look extra nice in latex world, you could use Tikz device. R
 
 ```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure2}", fig.height = 3, fig.width = 6, dev = 'png'}
 
-ExampleData <- read_rds( "data/Example_data.rds")
-
-source("code/Example_Plot_Scatter.R") # Load a function from your 'code' folder. This e.g. plots scatters to your own preferences.
-source( "code/Data_Create.R") #
-
-ExampleData <- Data_Create(N = 100) # Same as the ExampleData loaded above - this is just a function to create the stored data.
-
-g <- Example_Plot_Scatter(DataInput = ExampleData,
-                          X = "Height_Score",
-                          Y = "Weight_Score",
-                          Z = "Agility_Score",
-                          Theme = theme_bw(), # run ?ggthemes for other themes.
-                          Title = "", # I prefer to use the caption set above.
-                          Ylab = "Height",
-                          Xlab = "Lenght",
-                          LegendTitle = "Agility",
-                          TitleSize = 10,
-                          LabSize = 10)
-
-g
-
-# Although the functions above are really simple, the principle is simple: containing calculations and data wrangling in their own functions will make this template much cleaner and more manageable.
-# When you start working, delete these meaningless functions and replace with your own...
+library(patchwork)
+library(purrr)
+library(ggplot2)
+source("code/First_fruits_plot.R")
+source("code/Fruit_extractor.R")
+source("code/Reg_Graph_Creator.R")
+source("code/Regression_Plot.R")
 
 ```
 
@@ -226,165 +197,152 @@ You can also very easily split a page using built-in Pandoc formatting. I commen
 
 
 
-#  Methodology \label{Meth}
-
-## Subsection
-Ideally do not overuse subsections. It equates to bad writing.^[This is an example of a footnote by the way. Something that should also not be overused.]
-
-## Math section
-
-Equations should be written as such:
-
-\begin{align}
-\beta = \sum_{i = 1}^{\infty}\frac{\alpha^2}{\sigma_{t-1}^2} \label{eq1} \\
-\int_{x = 1}^{\infty}x_{i} = 1 \notag
-\end{align}
-
-If you would like to see the equations as you type in Rmarkdown, use $ symbols instead (see this for yourself by adjusted the equation):
-
-$$
-\beta = \sum_{i = 1}^{\infty}\frac{\alpha^2}{\sigma_{t-1}^2} \\
-\int_{x = 1}^{\infty}x_{i} = 1
-$$
-
-Note the equation above - this should appear in math in Rstudio. Writing nice math requires practice. Note I used a forward slashes to make a space in the equations. I can also align equations using  __\&__, and set to numbering only the first line. Now I will have to type ``begin equation'' which is a native \LaTeX command. Here follows a more complicated equation that you want aligned (using \& sign) and numbered:
-
-
-\begin{align}
-	y_t &= c + B(L) y_{t-1} + e_t   \label{eq2}    \\ \notag
-	e_t &= H_t^{1/2}  z_t ; \quad z_t \sim  N(0,I_N) \quad \& \quad H_t = D_tR_tD_t \\ \notag
-		D_t^2 &= {\sigma_{1,t}, \dots, \sigma_{N,t}}   \\ \notag
-		\sigma_{i,t}^2 &= \gamma_i+\kappa_{i,t}  v_{i, t-1}^2 +\eta_i  \sigma_{i, t-1}^2, \quad \forall i \\ \notag
-		R_{t, i, j} &= {diag(Q_{t, i, j}}^{-1}) . Q_{t, i, j} . diag(Q_{t, i, j}^{-1})  \\ \notag
-		Q_{t, i, j} &= (1-\alpha-\beta)  \bar{Q} + \alpha  z_t  z_t'  + \beta  Q_{t, i, j} \notag
-\end{align}
-
-Note that in \ref{eq2} I have aligned the equations by the equal signs. I also want only one tag, and I create spaces using ``quads''.
-
-See if you can figure out how to do complex math using the two examples provided in \ref{eq1} and \ref{eq2}.
-
-<!-- $$ -->
-<!-- This is a commented out section in the writing part. -->
-<!-- Comments are created by highlighting text, amnd pressing CTL+C -->
-<!-- \\begin{align} -->
-<!-- \\beta = \\alpha^2 -->
-<!-- \end{align} -->
-<!-- $$ -->
 
 # Results
 
-Tables can be included as follows. Use the _xtable_ (or kable) package for tables. Table placement = H implies Latex tries to place the table Here, and not on a new page (there are, however, very many ways to skin this cat. Luckily there are many forums online!).
+##Part A
 
 
-```{r ShortTable, results = 'asis'}
+```{r, fig.height=6, fig.width=6}
 
-library(xtable)
-data <- mtcars[1:5,] %>% tibble::as_tibble()
+Loc <- "/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Wine"
+dff <- read_rds("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Wine/WineMag.rds")
+Fruitlist <- read_table("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Wine/Fruitlist.txt")
 
-table <- xtable(data, caption = "Short Table Example \\label{tab1}")
-  print.xtable(table,
-             # tabular.environment = "longtable",
-             floating = TRUE,
-             table.placement = 'H',
-             # scalebox = 0.3,
-             comment = FALSE,
-             caption.placement = 'bottom'
-             )
+#plot of how many rating each country received, with median score
+
+#First get the median
+library(dplyr)
+
+rating_count <- dff %>%
+  group_by(country) %>%
+  summarise(rating_count = n()) %>%
+  arrange(desc(rating_count))
+
+median_score <-dff %>%
+  group_by(country) %>%
+  summarise(median_score = median(points, na.rm = TRUE))
+
+#merging the two 
+
+merged_data <- left_join(rating_count, median_score, by = "country")
+
+#plotting
+library(tidyr)
+library(gridExtra)
+library(grid)
+library(extrafont)
+library(ggplot2)
+
+# Create the barplot
+barplot <- ggplot(merged_data, aes(x = reorder(country, -rating_count), y = rating_count, fill = country)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  xlab("Country") +
+  ylab("Rating Count") +
+  ggtitle("Number of Ratings by Country") +
+  coord_flip()+
+    guides(fill=FALSE)
+
+# Rotate x-axis labels vertically
+barplot <- barplot +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+# Add median scores as vertical text above each bar
+barplot <- barplot +
+  geom_text(aes(label = median_score), hjust = -0.5, color = "black", size = 3)
+
+# Display the plot
+print(barplot)
+
+#you will have to take away the legend int he test
+
 
 ```
 
-To reference calculations __in text__, _do this:_ From table \ref{tab1} we see the average value of mpg is `r mean(mtcars[1:5,]$mpg)`.
+##Part B
 
-Including tables that span across pages, use the following (note that I add below the table: ``continue on the next page''). This is a neat way of splitting your table across a page.
+```{r}
+#Focusing on the local wine industry - plot the 5 most preferred wineries (using medianpoints) above $20 for the tasters Laurne Buzzeo and Susan Kostrzewa. Use your owndiscretion in how you want to display this.
+SA <- dff %>%
+  filter(country=="South Africa")
 
-Use the following default settings to build your own possibly long tables. Note that the following will fit on one page if it can, but cleanly spreads over multiple pages:
+library(ggplot2)
 
-```{r LongTable, results = 'asis'}
+# Filter the data for the specified tasters and price range
+filtered_data <- SA %>%
+  filter(taster_name %in% c("Lauren Buzzeo", "Susan Kostrzewa"),
+         price > 50)
 
-library(xtable)
 
-data = mtcars %>% tibble::as_tibble()
-  addtorow          <- list()
-  addtorow$pos      <- list()
-  addtorow$pos[[1]] <- c(0)
-  addtorow$command  <- c(paste("\\hline \n",
-                               "\\endhead \n",
-                               "\\hline \n",
-                               "{\\footnotesize Continued on next page} \n",
-                               "\\endfoot \n",
-                               "\\endlastfoot \n",sep=""))
-table <- xtable(data, caption = "Long Table Example")
-  print.xtable(table,
-             tabular.environment = "longtable",
-             floating = FALSE, # Leave this as is.
-             table.placement = 'H', # Leave this as is.
-             booktabs = T, # Aesthetics
-             include.rownames = FALSE,  # Typically you don't want this in a table.
-             add.to.row = addtorow, # For adding the Continued on next page part...
-             comment = FALSE,
-             caption.placement = 'top',  # Where do you want the caption?
-             size="\\fontsize{12pt}{13pt}\\selectfont"  # Size of text in table..
-             )
-# See https://cran.r-project.org/web/packages/xtable/vignettes/xtableGallery.pdf for table inspiration
+Top_5_Wineries_SA_Plot <- function(filtered_data, Tasters){
+
+
+gg <-
+    filtered_data %>%
+    group_by(taster_name, winery) %>% summarise(Med_pnts = median(points)) %>%
+    group_by(taster_name) %>% top_n(3, Med_pnts) %>%
+    arrange(desc(Med_pnts)) %>%
+    ggplot() +
+    geom_point(aes(winery, Med_pnts, color = taster_name), size = 5, alpha = 0.7) +
+    geom_segment(aes(x = winery, xend = winery, y = 80, yend = Med_pnts), size = 1.5, alpha = 0.7, color = "darkgreen") +
+    facet_wrap(~taster_name, scales = "free_x") +
+    ylim( c(80,100)) +
+    scale_y_continuous( limits = c(80, 98)) +
+    theme_bw() + guides(color = F) +
+    scale_fill_brewer(palette="Dark2") +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+    labs(title = "Top Median Reviews per Winery: South Africa", subtitle = "Top wineries for Lauren and Susan", caption = "Data source: WineMag.com", x = "", y = "Median Winery review for wines over $20") +
+    theme(legend.position = "top", legend.title = element_blank()) +
+    theme(plot.title = element_text(size = 14),
+          plot.subtitle = element_text(size = 12))
+
+gg
+
+}
+
+gg <- Top_5_Wineries_SA_Plot(filtered_data, Tasters)
+
+gg
+
 ```
+
+##Part C
+```{r}
+try <- function(dff) {
+  taster_names <- c("Lauren Buzzeo", "Susan Kostrzewa")
+  correlations <- vector("numeric", length(taster_names))
+
+  for (i in seq_along(taster_names)) {
+    filtered_data <- dff %>%
+      filter(taster_name == taster_names[i], !is.na(price), !is.na(points))
+    correlations[i] <- cor(filtered_data$price, filtered_data$points, method = "spearman")
+  }
+  
+  result <- data.frame(taster_name = taster_names, correlation = correlations)
+  return(result)
+}
+
+result <- try(dff)
+print(result)
+```
+##PART D
+
+```{r}
+#Run a regression using the following formula: lm(“points ˜ price + province + variety”)
+#Plot the fitted vs actual values for both Lauren and Susan, in order to compare the impact that known factors have on their scores (such as price, province and variety)
+#we’d prefer this to be low, implying the tasters truly only value the wine tasted, not other factors.
+
+Regression_Plot(filtered_data)
+```
+
 
 \hfill
 
 <!-- hfill can be used to create a space, like here between text and table. -->
 
 
-## Huxtable
 
-Huxtable is a very nice package for making working with tables between Rmarkdown and Tex easier.
-
-This cost some adjustment to the Tex templates to make it work, but it now works nicely.
-
-See documentation for this package [here](https://hughjonesd.github.io/huxtable/huxtable.html). A particularly nice addition of this package is for making the printing of regression results a joy (see [here](https://hughjonesd.github.io/huxtable/huxtable.html#creating-a-regression-table)). Here follows an example:
-
-
-If you are eager to use huxtable, comment out the Huxtable table in the Rmd template, and uncomment the colortbl package in your Rmd's root.
-
-Note that I do not include this in the ordinary template, as some latex users have complained it breaks when they build their Rmds (especially those using tidytex - I don't have this problem as I have the full Miktex installed on mine). Up to you, but I strongly recommend installing the package manually and using huxtable. To make this work, uncomment the _Adding additional latex packages_ part in yaml at the top of the Rmd file. Then comment out the huxtable example in the template below this line. Reknit, and enjoy.
-
-```{r, results = 'asis'}
-
-if(!require(huxtable)) install.packages(huxtable)
-library(huxtable)
-data(diamonds, package = 'ggplot2')
-Title <- "Regression Output"
-Label <- "Reg01"
-lm1 <- lm(price ~ carat, diamonds)
-lm2 <- lm(price ~ depth, diamonds)
-lm3 <- lm(price ~ carat + depth, diamonds)
-htab <-
-huxreg(lm1, lm2, lm3,
-                statistics = c(N = "nobs", R2 = "r.squared"),
-                note = "%stars%.") %>%
-  set_caption(Title) %>%
-  set_label(Label)
-# More settings:
-font_size(htab) <- 12
-# Let's change regression names: this is slightly hacky, but works. Comment out this section to see what the default looks like:
-  Names <- c( "Reg1", "Reg2", "Reg3")
-  for(i in 1:length(Names)) {
-    htab[1,][[1+i]] <- Names[i]
-  }
-# Now simply call the table:
-htab
-
-```
-
-FYI - R also recently introduced the gt package, which is worthwhile exploring too.
-
-# Lists
-
-To add lists, simply using the following notation
-
-* This is really simple
-
-    + Just note the spaces here - writing in R you have to sometimes be pedantic about spaces...
-
-* Note that Rmarkdown notation removes the pain of defining \LaTeX environments!
 
 # Conclusion
 
@@ -400,11 +358,4 @@ I hope you find this template useful. Remember, stackoverflow is your friend - u
 <div id="refs"></div>
 
 
-# Appendix {-}
-
-## Appendix A {-}
-
-Some appendix information here
-
-## Appendix B {-}
 

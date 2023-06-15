@@ -3,7 +3,7 @@
 # Remove comments and add values where applicable.
 # The descriptions below should be self-explanatory
 
-title: "Helping You Write Academic Papers in R using Texevier"
+title: "World Happiness Report"
 #subtitle: "This will appear as Right Header"
 
 documentclass: "elsarticle"
@@ -25,17 +25,17 @@ Thesis_FP: FALSE
 # --------- Front Page
 # Comment: ----- Follow this pattern for up to 5 authors
 AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
-Author1: "Jane Doe^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
-Ref1: "Some Institution, Cape Town, South Africa" # First Author's Affiliation
-Email1: "nfkatzke\\@gmail.com" # First Author's Email address
+Author1: "Gabriella Neilon"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University" # First Author's Affiliation
+Email1: "22581340\\@sun.ac.za" # First Author's Email address
 
-Author2: "John Smith"
-Ref2: "Some other Institution, Cape Town, South Africa"
-Email2: "John\\@gmail.com"
-CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
-
-Author3: "John Doe"
-Email3: "Joe\\@gmail.com"
+# Author2: "John Smith"
+# Ref2: "Some other Institution, Cape Town, South Africa"
+# Email2: "John\\@gmail.com"
+# CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+# 
+# Author3: "John Doe"
+# Email3: "Joe\\@gmail.com"
 
 CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
 
@@ -92,7 +92,7 @@ output:
     fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
     fig_height: 3.5
 abstract: |
-  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+  The first question deals with Happiness. Will write more for final exam, this is just to test how it works. All of the write-ups will be subpar, as the purpose is first to get the hand of things.
 ---
 
 <!-- First: Set your default preferences for chunk options: -->
@@ -123,40 +123,20 @@ write_rds(Example_data, path = "data/Example_data.rds")
 
 # Introduction \label{Introduction}
 
-References are to be made as follows: @fama1997[p. 33] and @grinold2000 Such authors could also be referenced in brackets [@grinold2000] and together [@fama1997 \& @grinold2000]. Source the reference code from scholar.google.com by clicking on ``cite'' below article name. Then select BibTeX at the bottom of the Cite window, and proceed to copy and paste this code into your ref.bib file, located in the directory's Tex folder. Open this file in Rstudio for ease of management, else open it in your preferred Tex environment. Add and manage your article details here for simplicity - once saved, it will self-adjust in your paper.
+Looking at happiness reports for different regions based on their Average Life Expectancy, and comparing it specifically to South Africa.
 
 > I suggest renaming the top line after \@article, as done in the template ref.bib file, to something more intuitive for you to remember. Do not change the rest of the code. Also, be mindful of the fact that bib references from google scholar may at times be incorrect. Reference Latex forums for correct bibtex notation.
 
-To reference a section, you have to set a label using ``\\label'' in R, and then reference it in-text as e.g. referencing a later section, Section \ref{Meth}.
 
-Writing in Rmarkdown is surprizingly easy - see [this website](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf) cheatsheet for a summary on writing Rmd writing tips.
 
 # Data  {-}
-
-Notice how I used the curly brackets and dash to remove the numbering of the data section.
-
-Discussion of data should be thorough with a table of statistics and ideally a figure.
-
-In your tempalte folder, you will find a Data and a Code folder. In order to keep your data files neat, store all of them in your Data folder. Also, I strongly suggest keeping this Rmd file for writing and executing commands, not writing out long pieces of data-wrangling. In the example below, I simply create a ggplot template for scatter plot consistency. I suggest keeping all your data in a data folder.
+Data corresponds to that given in the Mock Practical
 
 <!-- The following is a code chunk. It must have its own unique name (after the r), or no name. After the comma follows commands for R which are self-explanatory. By default, the code and messages will not be printed in your pdf, just the output: -->
 
 ```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure1}", fig.ext = 'png', fig.height = 3, fig.width = 6}
 
-  # This is just a random plot to show you a plot. This is done if the getwd() does not point to your Template's directory.
-  # Set WD below to your project's working directory.
-
-  g <-
-  ggplot(data = mtcars) +
-  geom_point(aes(x = disp, y = hp, color = cyl)) +
-  theme_bw() +
-  # theme(legend.position = "none") +
-  theme(plot.title = element_text(size = 10)) +
-  theme(axis.title = element_text(size = 10),
-        axis.title.x = element_text()) +
-  labs(y = "y-axis", x = "x-axis", title = "Some amazing plot")
-
-g
+ 
 
 ```
 
@@ -164,26 +144,7 @@ To make your graphs look extra nice in latex world, you could use Tikz device. R
 
 ```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure2}", fig.height = 3, fig.width = 6, dev = 'png'}
 
-ExampleData <- read_rds( "data/Example_data.rds")
 
-source("code/Example_Plot_Scatter.R") # Load a function from your 'code' folder. This e.g. plots scatters to your own preferences.
-source( "code/Data_Create.R") #
-
-ExampleData <- Data_Create(N = 100) # Same as the ExampleData loaded above - this is just a function to create the stored data.
-
-g <- Example_Plot_Scatter(DataInput = ExampleData,
-                          X = "Height_Score",
-                          Y = "Weight_Score",
-                          Z = "Agility_Score",
-                          Theme = theme_bw(), # run ?ggthemes for other themes.
-                          Title = "", # I prefer to use the caption set above.
-                          Ylab = "Height",
-                          Xlab = "Lenght",
-                          LegendTitle = "Agility",
-                          TitleSize = 10,
-                          LabSize = 10)
-
-g
 
 # Although the functions above are really simple, the principle is simple: containing calculations and data wrangling in their own functions will make this template much cleaner and more manageable.
 # When you start working, delete these meaningless functions and replace with your own...
@@ -226,50 +187,6 @@ You can also very easily split a page using built-in Pandoc formatting. I commen
 
 
 
-#  Methodology \label{Meth}
-
-## Subsection
-Ideally do not overuse subsections. It equates to bad writing.^[This is an example of a footnote by the way. Something that should also not be overused.]
-
-## Math section
-
-Equations should be written as such:
-
-\begin{align}
-\beta = \sum_{i = 1}^{\infty}\frac{\alpha^2}{\sigma_{t-1}^2} \label{eq1} \\
-\int_{x = 1}^{\infty}x_{i} = 1 \notag
-\end{align}
-
-If you would like to see the equations as you type in Rmarkdown, use $ symbols instead (see this for yourself by adjusted the equation):
-
-$$
-\beta = \sum_{i = 1}^{\infty}\frac{\alpha^2}{\sigma_{t-1}^2} \\
-\int_{x = 1}^{\infty}x_{i} = 1
-$$
-
-Note the equation above - this should appear in math in Rstudio. Writing nice math requires practice. Note I used a forward slashes to make a space in the equations. I can also align equations using  __\&__, and set to numbering only the first line. Now I will have to type ``begin equation'' which is a native \LaTeX command. Here follows a more complicated equation that you want aligned (using \& sign) and numbered:
-
-
-\begin{align}
-	y_t &= c + B(L) y_{t-1} + e_t   \label{eq2}    \\ \notag
-	e_t &= H_t^{1/2}  z_t ; \quad z_t \sim  N(0,I_N) \quad \& \quad H_t = D_tR_tD_t \\ \notag
-		D_t^2 &= {\sigma_{1,t}, \dots, \sigma_{N,t}}   \\ \notag
-		\sigma_{i,t}^2 &= \gamma_i+\kappa_{i,t}  v_{i, t-1}^2 +\eta_i  \sigma_{i, t-1}^2, \quad \forall i \\ \notag
-		R_{t, i, j} &= {diag(Q_{t, i, j}}^{-1}) . Q_{t, i, j} . diag(Q_{t, i, j}^{-1})  \\ \notag
-		Q_{t, i, j} &= (1-\alpha-\beta)  \bar{Q} + \alpha  z_t  z_t'  + \beta  Q_{t, i, j} \notag
-\end{align}
-
-Note that in \ref{eq2} I have aligned the equations by the equal signs. I also want only one tag, and I create spaces using ``quads''.
-
-See if you can figure out how to do complex math using the two examples provided in \ref{eq1} and \ref{eq2}.
-
-<!-- $$ -->
-<!-- This is a commented out section in the writing part. -->
-<!-- Comments are created by highlighting text, amnd pressing CTL+C -->
-<!-- \\begin{align} -->
-<!-- \\beta = \\alpha^2 -->
-<!-- \end{align} -->
-<!-- $$ -->
 
 # Results
 
@@ -277,55 +194,121 @@ Tables can be included as follows. Use the _xtable_ (or kable) package for table
 
 
 ```{r ShortTable, results = 'asis'}
+library(patchwork)
+library(purrr)
+library(ggplot2)
+source("code/Data_Collating.R")
+source("code/plot_orderset.R")
 
-library(xtable)
-data <- mtcars[1:5,] %>% tibble::as_tibble()
+all_data <- Data_Collating("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Happy")
+Barplot_breakdown_Happy_Contributors <- function(all_data, Title, Subtitle,
+                                                 xaxis_size = 10,
+                                                 xaxis_rows = 2){
 
-table <- xtable(data, caption = "Short Table Example \\label{tab1}")
-  print.xtable(table,
-             # tabular.environment = "longtable",
-             floating = TRUE,
-             table.placement = 'H',
-             # scalebox = 0.3,
-             comment = FALSE,
-             caption.placement = 'bottom'
-             )
+    # This removes the ugly summarise warning...
+    options(dplyr.summarise.inform=F)
+
+dfp <-
+    all_data %>%
+    group_by(`Regional indicator`) %>% summarise_at( vars( c(`Ladder score`, starts_with("Explained"), `Dystopia + residual`)), ~mean(.)) %>%
+    gather(Score, Value, -`Regional indicator`, -`Ladder score`) %>%
+    mutate(Score = gsub("Explained by: ", "", Score))
+
+# Make SA data bindable:
+SA <-
+    all_data %>% filter(`Country name` == "South Africa") %>% select(c(`Regional indicator`, `Ladder score`, starts_with("Explained"), `Dystopia + residual`)) %>% mutate(`Regional indicator` = "South Africa") %>%
+    gather(Score, Value, -`Regional indicator`, -`Ladder score`) %>%
+    mutate(Score = gsub("Explained by: ", "", Score))
+
+# See this makes your life much easier:
+dfp <- bind_rows(dfp,SA)
+
+# Arrange the Score column for consistency as from highest avg to lowest:
+
+order1 <- c("South Africa",
+            all_data %>% group_by(`Regional indicator`) %>% summarise(Lad = mean(`Ladder score`)) %>% arrange(Lad) %>% pull(`Regional indicator`))
+order2 <- dfp %>% group_by(Score) %>% summarise(Avg = mean(Value)) %>% arrange(Avg) %>% pull(Score)
+
+g <-
+dfp %>%
+    plot_orderset(., Column = "Regional indicator", Order = order1) %>%
+    plot_orderset(., Column = "Score", Order = order2) %>%
+    ggplot() + geom_bar(aes(`Regional indicator`, y = Value, fill = Score), stat = "identity", position = "stack") +
+    theme_bw() +
+    scale_fill_brewer(palette="Dark2") +
+    scale_x_discrete(guide = guide_axis(n.dodge = xaxis_rows)) +
+    labs(title = Title, subtitle = Subtitle, caption = "Data source: World Happiness Index", x = "", y = "Breakdown of Happiness") +
+    theme(legend.position = "top", legend.title = element_blank()) +
+    theme(plot.title = element_text(size = 14),
+          plot.subtitle = element_text(size = 12), axis.text.x = element_text(size = xaxis_size)) +
+    guides(fill = F)
+
+g
+
+
+}
+
+Error_bar_plot <- function(datcolat, xaxis_size = 5, xaxis_rows = 3){
+
+dfplot <-
+    datcolat %>%
+    group_by(`Regional indicator`) %>%
+    # summarise(across(c(`Ladder score`, ends_with("whisker")),
+    # list(median), .names = "{col}.{fn}") )
+    summarise_at( vars(c(`Ladder score`, ends_with("whisker")) ), ~median(.))
+
+# Life expectancy
+HE <-
+    datcolat %>% group_by(`Regional indicator`) %>% summarise_at(vars(`Healthy life expectancy`), ~median(.)) %>%
+    # For ease of naming:
+    rename(HE = `Healthy life expectancy`) %>% mutate(HE = round(HE, 1))
+
+# Join LE to plot, so that we have y-coordinates for LE label:
+dfplot <-
+    left_join(dfplot,
+              HE,
+              by = "Regional indicator")
+
+# Adjust ordering as per gist:
+order <- dfplot %>% arrange(HE) %>% pull(`Regional indicator`)
+dfplot <- dfplot %>% plot_orderset(., Column = "Regional indicator", Order = order)
+
+g <-
+    dfplot %>%
+    ggplot() +
+    geom_point(aes(x = `Regional indicator`, y = `Ladder score`, color = `Regional indicator`), size = 4, alpha = 0.8) +
+    geom_errorbar(aes(x = `Regional indicator`,
+                      ymin = lowerwhisker, ymax = upperwhisker, color = `Regional indicator`)) +
+    geom_text(aes(`Regional indicator`, y = upperwhisker, label = HE), vjust = 0) +
+
+
+    theme_bw() +
+    scale_x_discrete(guide = guide_axis(n.dodge = xaxis_rows)) +
+    labs(title = "Happiness Index", subtitle = "Some subtitle", caption = "Data source: World Happiness Index", x = "", y = "Happiness Score") +
+    theme(legend.position = "top", legend.title = element_blank()) +
+    theme(plot.title = element_text(size = 14),
+          plot.subtitle = element_text(size = 12),
+          axis.text.x = element_text(size = xaxis_size)) +
+    guides(color = F)
+# If you wanted to make the x-axis vertical:
+# theme(axis.text.x=element_text(angle = 90, hjust = 1))
+
+g
+
+
+}
+g <- Error_bar_plot(all_data, xaxis_size = 9, xaxis_rows = 3)
+
+g
+
 
 ```
 
-To reference calculations __in text__, _do this:_ From table \ref{tab1} we see the average value of mpg is `r mean(mtcars[1:5,]$mpg)`.
+This shows that America seems to be the happiest region, whereas Sub-Sahran Africa is the least.
 
-Including tables that span across pages, use the following (note that I add below the table: ``continue on the next page''). This is a neat way of splitting your table across a page.
+```{r}
 
-Use the following default settings to build your own possibly long tables. Note that the following will fit on one page if it can, but cleanly spreads over multiple pages:
 
-```{r LongTable, results = 'asis'}
-
-library(xtable)
-
-data = mtcars %>% tibble::as_tibble()
-  addtorow          <- list()
-  addtorow$pos      <- list()
-  addtorow$pos[[1]] <- c(0)
-  addtorow$command  <- c(paste("\\hline \n",
-                               "\\endhead \n",
-                               "\\hline \n",
-                               "{\\footnotesize Continued on next page} \n",
-                               "\\endfoot \n",
-                               "\\endlastfoot \n",sep=""))
-table <- xtable(data, caption = "Long Table Example")
-  print.xtable(table,
-             tabular.environment = "longtable",
-             floating = FALSE, # Leave this as is.
-             table.placement = 'H', # Leave this as is.
-             booktabs = T, # Aesthetics
-             include.rownames = FALSE,  # Typically you don't want this in a table.
-             add.to.row = addtorow, # For adding the Continued on next page part...
-             comment = FALSE,
-             caption.placement = 'top',  # Where do you want the caption?
-             size="\\fontsize{12pt}{13pt}\\selectfont"  # Size of text in table..
-             )
-# See https://cran.r-project.org/web/packages/xtable/vignettes/xtableGallery.pdf for table inspiration
 ```
 
 \hfill
@@ -348,29 +331,6 @@ Note that I do not include this in the ordinary template, as some latex users ha
 
 ```{r, results = 'asis'}
 
-if(!require(huxtable)) install.packages(huxtable)
-library(huxtable)
-data(diamonds, package = 'ggplot2')
-Title <- "Regression Output"
-Label <- "Reg01"
-lm1 <- lm(price ~ carat, diamonds)
-lm2 <- lm(price ~ depth, diamonds)
-lm3 <- lm(price ~ carat + depth, diamonds)
-htab <-
-huxreg(lm1, lm2, lm3,
-                statistics = c(N = "nobs", R2 = "r.squared"),
-                note = "%stars%.") %>%
-  set_caption(Title) %>%
-  set_label(Label)
-# More settings:
-font_size(htab) <- 12
-# Let's change regression names: this is slightly hacky, but works. Comment out this section to see what the default looks like:
-  Names <- c( "Reg1", "Reg2", "Reg3")
-  for(i in 1:length(Names)) {
-    htab[1,][[1+i]] <- Names[i]
-  }
-# Now simply call the table:
-htab
 
 ```
 
@@ -395,16 +355,5 @@ I hope you find this template useful. Remember, stackoverflow is your friend - u
 
 \newpage
 
-# References {-}
-
-<div id="refs"></div>
-
-
-# Appendix {-}
-
-## Appendix A {-}
-
-Some appendix information here
-
-## Appendix B {-}
+just in case
 
