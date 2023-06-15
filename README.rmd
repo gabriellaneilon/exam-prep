@@ -1,0 +1,617 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+# Purpose
+
+Purpose of this work folder.
+
+Ideally store a minimum working example data set in data folder.
+
+Add binary files in bin, and closed R functions in code. Human Readable settings files (e.g. csv) should be placed in settings/
+
+
+```{r}
+
+library(dplyr)
+library(pacman)
+rm(list = ls()) # Clean your environment:
+gc() # garbage collection - It can be useful to call gc after a large object has been removed, as this may prompt R to return memory to the operating system.
+library(tidyverse)
+list.files('Project_Question1/code/', full.names = T, recursive = T) %>% .[grepl('.R', .)] %>% as.list() %>% walk(~source(.))
+```
+
+```{r}
+pacman::p_load(patchwork)
+
+pacman::p_load(purrr)
+
+library(patchwork)
+library(purrr)
+library(ggplot2)
+all_data <- Data_Collating("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Happy")
+Barplot_breakdown_Happy_Contributors <- function(all_data, Title, Subtitle,
+                                                 xaxis_size = 10,
+                                                 xaxis_rows = 2){
+
+    # This removes the ugly summarise warning...
+    options(dplyr.summarise.inform=F)
+
+dfp <-
+    all_data %>%
+    group_by(`Regional indicator`) %>% summarise_at( vars( c(`Ladder score`, starts_with("Explained"), `Dystopia + residual`)), ~mean(.)) %>%
+    gather(Score, Value, -`Regional indicator`, -`Ladder score`) %>%
+    mutate(Score = gsub("Explained by: ", "", Score))
+
+# Make SA data bindable:
+SA <-
+    all_data %>% filter(`Country name` == "South Africa") %>% select(c(`Regional indicator`, `Ladder score`, starts_with("Explained"), `Dystopia + residual`)) %>% mutate(`Regional indicator` = "South Africa") %>%
+    gather(Score, Value, -`Regional indicator`, -`Ladder score`) %>%
+    mutate(Score = gsub("Explained by: ", "", Score))
+
+# See this makes your life much easier:
+dfp <- bind_rows(dfp,SA)
+
+# Arrange the Score column for consistency as from highest avg to lowest:
+
+order1 <- c("South Africa",
+            all_data %>% group_by(`Regional indicator`) %>% summarise(Lad = mean(`Ladder score`)) %>% arrange(Lad) %>% pull(`Regional indicator`))
+order2 <- dfp %>% group_by(Score) %>% summarise(Avg = mean(Value)) %>% arrange(Avg) %>% pull(Score)
+
+g <-
+dfp %>%
+    plot_orderset(., Column = "Regional indicator", Order = order1) %>%
+    plot_orderset(., Column = "Score", Order = order2) %>%
+    ggplot() + geom_bar(aes(`Regional indicator`, y = Value, fill = Score), stat = "identity", position = "stack") +
+    theme_bw() +
+    scale_fill_brewer(palette="Dark2") +
+    scale_x_discrete(guide = guide_axis(n.dodge = xaxis_rows)) +
+    labs(title = Title, subtitle = Subtitle, caption = "Data source: World Happiness Index", x = "", y = "Breakdown of Happiness") +
+    theme(legend.position = "top", legend.title = element_blank()) +
+    theme(plot.title = element_text(size = 14),
+          plot.subtitle = element_text(size = 12), axis.text.x = element_text(size = xaxis_size)) +
+    guides(fill = F)
+
+g
+
+
+}
+
+Error_bar_plot <- function(datcolat, xaxis_size = 5, xaxis_rows = 3){
+
+dfplot <-
+    datcolat %>%
+    group_by(`Regional indicator`) %>%
+    # summarise(across(c(`Ladder score`, ends_with("whisker")),
+    # list(median), .names = "{col}.{fn}") )
+    summarise_at( vars(c(`Ladder score`, ends_with("whisker")) ), ~median(.))
+
+# Life expectancy
+HE <-
+    datcolat %>% group_by(`Regional indicator`) %>% summarise_at(vars(`Healthy life expectancy`), ~median(.)) %>%
+    # For ease of naming:
+    rename(HE = `Healthy life expectancy`) %>% mutate(HE = round(HE, 1))
+
+# Join LE to plot, so that we have y-coordinates for LE label:
+dfplot <-
+    left_join(dfplot,
+              HE,
+              by = "Regional indicator")
+
+# Adjust ordering as per gist:
+order <- dfplot %>% arrange(HE) %>% pull(`Regional indicator`)
+dfplot <- dfplot %>% plot_orderset(., Column = "Regional indicator", Order = order)
+
+g <-
+    dfplot %>%
+    ggplot() +
+    geom_point(aes(x = `Regional indicator`, y = `Ladder score`, color = `Regional indicator`), size = 4, alpha = 0.8) +
+    geom_errorbar(aes(x = `Regional indicator`,
+                      ymin = lowerwhisker, ymax = upperwhisker, color = `Regional indicator`)) +
+    geom_text(aes(`Regional indicator`, y = upperwhisker, label = HE), vjust = 0) +
+
+
+    theme_bw() +
+    scale_x_discrete(guide = guide_axis(n.dodge = xaxis_rows)) +
+    labs(title = "Happiness Index", subtitle = "Some subtitle", caption = "Data source: World Happiness Index", x = "", y = "Happiness Score") +
+    theme(legend.position = "top", legend.title = element_blank()) +
+    theme(plot.title = element_text(size = 14),
+          plot.subtitle = element_text(size = 12),
+          axis.text.x = element_text(size = xaxis_size)) +
+    guides(color = F)
+# If you wanted to make the x-axis vertical:
+# theme(axis.text.x=element_text(angle = 90, hjust = 1))
+
+g
+
+
+}
+g <- Error_bar_plot(all_data, xaxis_size = 9, xaxis_rows = 3)
+
+g
+
+```
+
+##Question 2
+```{r}
+library(tidyverse)
+library(glue)
+list.files('Project_Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+Loc <- "/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Wine"
+dff <- read_rds("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Wine/WineMag.rds")
+Fruitlist <- read_table("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Wine/Fruitlist.txt")
+
+#plot of how many rating each country received, with median score
+
+#First get the median
+library(dplyr)
+
+rating_count <- dff %>%
+  group_by(country) %>%
+  summarise(rating_count = n()) %>%
+  arrange(desc(rating_count))
+
+median_score <-dff %>%
+  group_by(country) %>%
+  summarise(median_score = median(points, na.rm = TRUE))
+
+#merging the two 
+
+merged_data <- left_join(rating_count, median_score, by = "country")
+
+#plotting
+library(tidyr)
+library(gridExtra)
+library(grid)
+library(extrafont)
+library(ggplot2)
+
+# Create the barplot
+barplot <- ggplot(merged_data, aes(x = reorder(country, -rating_count), y = rating_count, fill = country)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  xlab("Country") +
+  ylab("Rating Count") +
+  ggtitle("Number of Ratings by Country") +
+  coord_flip()
+
+# Add median scores as vertical text above each bar
+barplot <- barplot +
+  geom_text(aes(label = median_score), hjust = -0.5, color = "black", size = 3)
+
+# Adjust x-axis label positioning
+barplot <- barplot +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0, vjust = 0.5))
+
+# Display the plot
+print(barplot)
+
+#alternative
+barplot <- ggplot(merged_data, aes(x = country, y = rating_count, fill=country)) +
+  geom_bar(stat = "identity") +
+    theme_bw()+
+  xlab("Country") +
+  ylab("Rating Count") +
+  ggtitle("Number of Ratings by Country")
+
+# Add median scores as vertical text above each bar
+barplot <- barplot +
+  geom_text(aes(label = median_score), vjust = -0.5, color = "black", size = 3)
+
+# Rotate x-axis labels for better readability
+barplot <- barplot +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Display the plot
+
+print(barplot)
+
+
+
+
+```
+
+```{r}
+#Create a table of the frequency with which Sommeliers use the words: Tannins ; smoke,smokey or ash ; wooded, wooden or woody. (with chosen countries)
+
+selected_countries <- c("South Africa", "Italy", "France", "US", "Spain")
+
+dff_adj <- dff %>%
+  filter(country %in% selected_countries)
+
+Term_refs_perc <- function(dff_adj, Terms = c("tannins", "Tannins", "Smoke", "Smokey", "Smoke", "smoke", "smokey", "smoke", "ash", "Ash")){
+
+    Term_ref_freq <-
+        dff_adj %>%
+        group_by(country) %>% summarise(Percent = sum( grepl( paste(Terms, collapse = "|"), description )) / n()) %>%
+        mutate(Term = glue::glue_collapse(Terms, sep = ", ", last = " and ") )
+
+    Term_ref_freq
+
+}
+
+Term_refs_table <- function(dff, Latex = TRUE){
+library(xtable)
+    # NB to remove xtable's comments as (https://stackoverflow.com/questions/24400308/how-to-remove-the-lines-in-xtable-table-output-by-knitr):
+    options(xtable.comment = FALSE)
+
+    Result <-
+    bind_rows(
+        Term_refs_perc(dff_adj, Terms = c("tannins")),
+        Term_refs_perc(dff_adj, Terms = c("smoke", "smokey", "ash"))
+    ) %>% mutate(Percent = paste0(round(Percent*100, 3), "%"))
+
+    # If using Texevier, use this:
+    # addtorow <- Tab_Span_Page()
+
+    if(Latex){
+
+        Tab <- xtable(Result, caption = "Long Table Example  \\label{tab1}")
+
+        # If using Texevier (check):
+    # Tab <-
+    # print.xtable(table,
+    #              tabular.environment = "longtable",
+    #              floating = FALSE, # Leave this as is.
+    #              table.placement = 'H', # Leave this as is.
+    #              booktabs = T, # Aesthetics
+    #              include.rownames = FALSE,  # Typically you don't want this in a table.
+    #              add.to.row = addtorow, # For adding the Continued on next page part...
+    #              comment = FALSE,
+    #              caption.placement = 'top',  # Where do you want the caption?
+    #              size="\\fontsize{12pt}{13pt}\\selectfont"  # Size of text in table..
+    # )
+
+    } else {
+
+Tab <-
+    knitr::kable(Result)
+    }
+
+    Tab
+}
+
+Tab <- Term_refs_table(dff_adj, Latex = FALSE)
+Tab
+
+
+#Create a plot of the most referenced fruits in Sommelier’s descriptions for the countries
+#listed below. Each country should have its own plot - arranged by the 5 most referenced
+#fruit as a sum of the percentages (use the below country order as well): South Africa, Italy, France, US and Spain
+list.files('Project_Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+froots <- Fruitlist$Fruits  %>% unique %>% as.list()
+fruit_count <- froots %>% map_df(~Fruit_extractor(dff_adj, froots = .))
+g <- First_fruits_plot(fruit_count, xaxis_rows = 2, xaxis_size = 5)
+g
+
+
+
+
+```
+
+```{r}
+#Focusing on the local wine industry - plot the 5 most preferred wineries (using medianpoints) above $20 for the tasters Laurne Buzzeo and Susan Kostrzewa. Use your owndiscretion in how you want to display this.
+SA <- dff %>%
+  filter(country=="South Africa")
+
+library(ggplot2)
+
+# Filter the data for the specified tasters and price range
+filtered_data <- SA %>%
+  filter(taster_name %in% c("Lauren Buzzeo", "Susan Kostrzewa"),
+         price > 50)
+
+
+Top_5_Wineries_SA_Plot <- function(filtered_data, Tasters){
+
+
+gg <-
+    filtered_data %>%
+    group_by(taster_name, winery) %>% summarise(Med_pnts = median(points)) %>%
+    group_by(taster_name) %>% top_n(3, Med_pnts) %>%
+    arrange(desc(Med_pnts)) %>%
+    ggplot() +
+    geom_point(aes(winery, Med_pnts, color = taster_name), size = 5, alpha = 0.7) +
+    geom_segment(aes(x = winery, xend = winery, y = 80, yend = Med_pnts), size = 1.5, alpha = 0.7, color = "darkgreen") +
+    facet_wrap(~taster_name, scales = "free_x") +
+    ylim( c(80,100)) +
+    scale_y_continuous( limits = c(80, 98)) +
+    theme_bw() + guides(color = F) +
+    scale_fill_brewer(palette="Dark2") +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+    labs(title = "Top Median Reviews per Winery: South Africa", subtitle = "Top wineries for Lauren and Susan", caption = "Data source: WineMag.com", x = "", y = "Median Winery review for wines over $20") +
+    theme(legend.position = "top", legend.title = element_blank()) +
+    theme(plot.title = element_text(size = 14),
+          plot.subtitle = element_text(size = 12))
+
+gg
+
+}
+
+gg <- Top_5_Wineries_SA_Plot(filtered_data, Tasters)
+
+gg
+
+```
+
+```{r}
+#Add two sentences discussing the two main tasters in SA’s points awarded Spearman Rank correlation with price. Show your calculation.
+
+
+try <- function(dff) {
+  taster_names <- c("Lauren Buzzeo", "Susan Kostrzewa")
+  correlations <- vector("numeric", length(taster_names))
+
+  for (i in seq_along(taster_names)) {
+    filtered_data <- dff %>%
+      filter(taster_name == taster_names[i], !is.na(price), !is.na(points))
+    correlations[i] <- cor(filtered_data$price, filtered_data$points, method = "spearman")
+  }
+  
+  result <- data.frame(taster_name = taster_names, correlation = correlations)
+  return(result)
+}
+
+result <- try(dff)
+print(result)
+
+
+
+
+```
+
+
+```{r}
+#Run a regression using the following formula: lm(“points ˜ price + province + variety”)
+#Plot the fitted vs actual values for both Lauren and Susan, in order to compare the impact that known factors have on their scores (such as price, province and variety)
+#we’d prefer this to be low, implying the tasters truly only value the wine tasted, not other factors.
+
+Regression_Plot(filtered_data)
+
+
+```
+##Question 3
+```{r}
+#“I firmly remember that Rotten Tomatoes was always a great review platform - and if a movie had a rating of more than 80% on Rotten Tomatoes, audiences would rate it above 85% every time.’ 
+
+list.files('Project_Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+movies <- read.csv("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Movies/Movies.csv")
+
+#so what I'm going to be doing is plot the rotten tomatoes and ausience rating first just to look at the data first visually simply to see what I want to do next
+
+library(ggplot2)
+
+# Create the scatter plot
+ggplot(movies, aes(x = Rotten.Tomatoes.., y = Audience..score..)) +
+  geom_point() +
+  theme_bw() +
+  labs(title = "Relationship between Rotten Tomatoes Rating and Audience Rating",
+       x = "Rotten Tomatoes Rating",
+       y = "Audience Rating")
+
+# Add a line representing the threshold of 80% Rotten Tomatoes rating and 85% audience rating
+ggplot(movies, aes(x = Rotten.Tomatoes.., y = Audience..score..)) +
+  geom_point() +
+  geom_hline(yintercept = 85, linetype = "dashed", color = "red") +
+  geom_vline(xintercept = 80, linetype = "dashed", color = "blue") +
+  theme_bw() +
+  labs(title = "Relationship between Rotten Tomatoes Rating and Audience Rating",
+       x = "Rotten Tomatoes Rating",
+       y = "Audience Rating")
+
+
+library(ggplot2)
+
+# Filter out rows with missing values for Rotten Tomatoes and Audience ratings
+filtered_movies <- movies[complete.cases(movies$Rotten.Tomatoes.., movies$Audience..score..), ]
+
+# Calculate the percentage of movies meeting the condition
+percentage <- mean(filtered_movies$Rotten.Tomatoes.. > 80 & filtered_movies$Audience..score.. > 85) * 100
+
+# Create a logical column indicating whether the statement is true for each movie
+filtered_movies$StatementTrue <- filtered_movies$Rotten.Tomatoes.. > 80 & filtered_movies$Audience..score.. > 85
+
+# Create the scatter plot
+ggplot(filtered_movies, aes(x = Rotten.Tomatoes.., y = Audience..score..)) +
+  geom_point() +
+  geom_hline(yintercept = 85, linetype = "dashed", color = "red") +
+  geom_vline(xintercept = 80, linetype = "dashed", color = "blue") +
+  theme_bw() +
+  labs(title = "Relationship between Rotten Tomatoes Rating and Audience Rating",
+       x = "Rotten Tomatoes Rating",
+       y = "Audience Rating") +
+  geom_text(x = 90, y = 95, label = paste0("Percentage True: ", round(percentage, 2), "%"), color = "black", size = 4) +
+  annotate("text", x = 90, y = 90, label = paste0("Total Movies: ", nrow(filtered_movies))) +
+  annotate("text", x = 90, y = 85, label = paste0("Statement True: ", sum(filtered_movies$StatementTrue),"%"), color = "blue")
+
+
+
+
+
+```
+
+#next
+```{r}
+#“Disney films may not have the highest grossing numbers, but they’ve always been the most profitable of all the leading studios.’ 
+ranked_studios <- movies %>%
+  select(Lead.Studio, Profitability, Worldwide.Gross) %>%
+  group_by(Lead.Studio) %>%
+  summarise(average_prof = mean(Profitability, na.rm = TRUE),
+            average_gross = mean(Worldwide.Gross)) %>%
+  mutate(Rank = dense_rank(average_prof)) %>%
+  filter(!is.na(average_prof)) %>%
+  arrange(average_prof)
+
+
+ranked_studios %>% 
+  ggplot() +
+  geom_bar(aes(x = Lead.Studio , y = average_prof, fill = Lead.Studio), stat = "identity") +
+  geom_text(aes(x = Lead.Studio, y = average_prof, label = round(average_prof, 2)), vjust = -0.5) +
+  theme_bw() +
+  labs(title = "Comparison of Profitability by Studio",
+       x = "Studio",
+       y = "Average Profitability") +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        plot.title = element_text(size = 14),
+        axis.text.x = element_text(size = 10)) +
+  guides(fill = FALSE)
+
+#this is the correct code
+movies %>%
+  select(Lead.Studio, Profitability, Worldwide.Gross) %>%
+  group_by(Lead.Studio) %>%
+  summarise(average_prof = mean(Profitability, na.rm = TRUE),
+            average_gross = mean(Worldwide.Gross)) %>%
+  mutate(Rank = dense_rank(-average_prof)) %>%
+  filter(!is.na(average_prof)) %>%
+  arrange(-average_prof)
+      
+#scale_fill_brewer(palette="Set3")
+
+```
+
+#next2
+```{r}
+#“Audiences are always drawn to the highest grossing films. In fact, I bet the correlation between the world wide grossing numbers and audience scores would be near 80%.
+cor(movies$Audience..score.., movies$Worldwide.Gross, method = "spearman")
+library(ggplot2)
+
+# Calculate the correlation between worldwide gross and audience scores
+correlation <- round(cor(movies$Worldwide.Gross, movies$Audience..score.., method = "spearman", use = "complete.obs"),4)
+
+# Define the strength of the relationship based on the correlation value
+relationship <- ifelse(correlation < 0.5 && correlation > 0, "Weak positive",
+                       ifelse(correlation >= 0.5 && correlation <= 1, "Strong positive",
+                              ifelse(correlation > -0.5 && correlation < 0, "Weak negative",
+                                     ifelse(correlation <= -0.5 && correlation >= -1, "Strong negative",
+                                            "No correlation"))))
+
+library(ggrepel)
+# Create a scatter plot
+movies %>% 
+    mutate(correlation=round(cor(movies$Worldwide.Gross, movies$Audience..score.., method = "spearman", use = "complete.obs"),4)) %>% 
+    mutate(relationship=ifelse(correlation < 0.5 && correlation > 0, "Weak positive",
+                       ifelse(correlation >= 0.5 && correlation <= 1, "Strong positive",
+                              ifelse(correlation > -0.5 && correlation < 0, "Weak negative",
+                                     ifelse(correlation <= -0.5 && correlation >= -1, "Strong negative",
+                                            "No correlation"))))) %>% 
+ggplot(movies, aes(x = Worldwide.Gross, y = Audience..score..)) +
+  geom_point() +
+ggrepel::geom_label_repel(aes(correlation, label = "Correlation", 
+    size = 4, alpha = 0.35, fill = "red")) + 
+ggrepel::geom_label_repel(aes(relationship, label = "Strength of relationship:", 
+    size = 4, alpha = 0.35, fill = "red"))+
+theme(legend.title = element_text("Total Murders"))+
+      labs(title = "Relationship between Worldwide Gross and Audience Scores",
+       x = "Worldwide Gross",
+       y = "Audience Score") +
+  theme_bw()
+
+
+
+# Determine the strength of the relationship
+ if (correlation < 0.5 && correlation > 0) {
+  relationship <- "Weak positive"
+} else if (correlation >= 0.5 && correlation <= 1) {
+  relationship <- "Strong positive"
+} else if (correlation > -0.5 && correlation < 0) {
+  relationship <- "Weak negative"
+} else if (correlation <= -0.5 && correlation >= -1) {
+  relationship <- "Strong negative"
+} else {
+  relationship <- "No correlation"
+}
+
+# Print the strength of the relationship
+cat("Strength of relationship: ", relationship, "\n")
+
+
+movies %>%
+  mutate(correlation = round(cor(Worldwide.Gross, Audience..score.., method = "spearman", use = "complete.obs"), 4)) %>%
+  mutate(relationship = ifelse(correlation < 0.5 && correlation > 0, "Weak positive",
+                              ifelse(correlation >= 0.5 && correlation <= 1, "Strong positive",
+                                     ifelse(correlation > -0.5 && correlation < 0, "Weak negative",
+                                            ifelse(correlation <= -0.5 && correlation >= -1, "Strong negative",
+                                                   "No correlation"))))) %>%
+  ggplot(aes(x = Worldwide.Gross, y = Audience..score..)) +
+  geom_point() +
+  geom_label(aes(label = paste0("Correlation: ", correlation), x = 600, y = 50), 
+             size = 6, alpha = 0.8, fill = "red") +
+  geom_label(aes(label = paste0("Strength of relationship: ", relationship), x = 600, y = 60), 
+             size = 6, alpha = 0.8, fill = "red") +
+  theme_bw() +
+  labs(title = "Relationship between Worldwide Gross and Audience Scores",
+       x = "Worldwide Gross",
+       y = "Audience Score")
+
+
+
+
+```
+##Question 4
+```{r}
+
+list.files('Project_Question1/code/', full.names = T, recursive = T) %>% as.list() %>% walk(~source(.))
+#getting data ready
+
+Lst <- 
+    list.files("/Users/gabriellaneilon/Library/Mobile Documents/com~apple~CloudDocs/Masters/1st Semester/Data Science 871/Mock_Prac/Mock_Prac_data/Tennis", full.names = T) %>% 
+    .[grepl("atp_matches", .)] %>% 
+    # I don't want to look at doubles - cos Nadal no play double.
+    .[!grepl("doubles", .)] %>% as.list()
+
+    
+# I want to only look at Grandslams, Masters and Finals - use Tournament_Inputs to filter.
+result_Large_events <- Data_Prep_Function(Lst, Tournament_Inputs = c("G", "M", "F"))
+
+library(dplyr)
+
+# Assuming the dataset is named 'tennis_data' and contains a column 'Year' for tournament year
+
+recent_years_data <- result_Large_events %>% filter(date >= "2018-01-01")
+
+
+View(result_Large_events)
+
+# Assuming 'Age' is a column in the dataset representing player age
+next_gen_players_data <- recent_years_data %>% filter(winner_age <= 25)
+
+# Calculate win rate for Next-Gen players
+next_gen_performance <- next_gen_players_data %>%
+  group_by(winner_name) %>%
+  summarize(TotalWins = n(),
+            WinRate = (TotalWins / nrow(next_gen_players_data)) * 100)
+
+# Calculate success rates in different tournament stages
+next_gen_tournament_performance <- next_gen_players_data %>%
+  group_by(winner_name, surface) %>%
+  summarize(TotalWins = n(),
+            SuccessRate = (TotalWins / nrow(next_gen_players_data)) * 100)
+
+
+library(ggplot2)
+
+# Bar plot of win rates for Next-Gen players
+ggplot(next_gen_performance, aes(x = winner_name, y = WinRate)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Win Rates of Next-Gen Players",
+       x = "Player Name",
+       y = "Win Rate")
+
+# Line plot of success rates in different tournament stages
+ggplot(next_gen_tournament_performance, aes(x = surface, y = SuccessRate, color = winner_name)) +
+  geom_line() +
+  labs(title = "Success Rates of Next-Gen Players in Tournament Stages",
+       x = "Tournament Stage",
+       y = "Success Rate")
+
+###NBNBNB will have to filter data more
+
+
+
+```
+
+
